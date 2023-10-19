@@ -1,0 +1,13 @@
+{
+  "base": {
+    "applicationName": "asmr-dl",
+    "applicationCopyrightShort": "(C) 2023 daydreamer-json",
+    "uiJsonLang": "ja-jp",
+    "spinnerSeq": ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]
+  },
+  "api": {
+    "baseUrl": "https://api.asmr-200.com/api",
+    "refererUrl": "https://www.asmr.one",
+    "userAgent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/102.0.0.0 Safari/537.36"
+  }
+}
