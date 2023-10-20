@@ -4,12 +4,12 @@ const rjIdRegexParse = require('./component/rjIdRegexParse');
 const apiGetWorkInfo = require('./component/apiConnect');
 const optimizeTrackDb = require('./component/optimizeTrackDb');
 
-module.exports.download = async function download (logger, id) {
+module.exports.download = async function download (logger, argv, id) {
   parsedIdObj = rjIdRegexParse(id);
   if (parsedIdObj === null) {
     logger.error(`Entered ID is invalid. Please input correct ID.`);
   } else {
-    const apiWorkInfoObj = await apiGetWorkInfo(logger, rjIdRegexParse(id));
+    const apiWorkInfoObj = await apiGetWorkInfo(logger, argv, rjIdRegexParse(id));
     if (apiWorkInfoObj !== null) {
       console.table({
         "Released Date": apiWorkInfoObj.pruned.release,
@@ -25,7 +25,7 @@ module.exports.download = async function download (logger, id) {
         "DLsite Link": `https://www.dlsite.com/home/work/=/product_id/RJ${rjIdRegexParse(id).parsed}.html`
       });
       const downloadTrackListArray = optimizeTrackDb(apiWorkInfoObj);
-      console.log(downloadTrackListArray.map((obj) => obj.path).join('\n'));
+      
     }
   }
 }
