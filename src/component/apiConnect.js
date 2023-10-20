@@ -1,4 +1,5 @@
 const configData = require('../config/default.json');
+const mathComponent = require('./math');
 const clui = require('clui');
 const clc = require('cli-color');
 const log4js = require('log4js');
@@ -106,9 +107,11 @@ module.exports = async function apiGetWorkInfo (logger, argv, id) {
       return null;
     } else {
       logger.trace(`API ping time list: ${JSON.stringify(apiPingString.times)}`);
-      logger.trace(`API ping statistics: Min=${apiPingString.min}, Max=${apiPingString.max}, Avg=${apiPingString.avg}, Loss=${apiPingString.packetLoss}`);
+      logger.trace(`API ping statistics: Min=${apiPingString.min}ms, Max=${apiPingString.max}ms, Avg=${mathComponent.rounder('ceil', apiPingString.times.map(Number).reduce((a,b)=>a+b) / apiPingString.times.length, 3, true)}ms, Loss=${apiPingString.packetLoss}`);
       logger.debug('API is reachable.');
     }
+  } else {
+    logger.debug('Pinging is disabled.');
   }
   if (apiPingString === null || apiPingString.alive === true) {
     logger.debug('Checking API health ...');
@@ -119,7 +122,7 @@ module.exports = async function apiGetWorkInfo (logger, argv, id) {
       spinner.stop();
       logger.debug('API is healthy.');
       const apiWorkInfoObj = {};
-      logger.debug(`Getting work info of ID RJ${id.parsed} ...`);
+      logger.info(`Getting work info of ID RJ${id.parsed} ...`);
       spinner = new clui.Spinner (`Getting work info of ID RJ${id.parsed} ...`, configData.base.spinnerSeq);
       spinner.start();
       apiWorkInfoObj.basic = await apiConnectGetBasicWorkInfo(logger, id.raw);
@@ -131,7 +134,7 @@ module.exports = async function apiGetWorkInfo (logger, argv, id) {
         logger.error(`API response body: ${JSON.stringify(apiWorkInfoObj.basic.data)}`);
         return null;
       } else {
-        logger.debug(`Work information was successfully fetched.`);
+        logger.info(`Work information was successfully fetched.`);
         return apiWorkInfoObj;
       }
     } else if (apiHealthString === 'NG') {

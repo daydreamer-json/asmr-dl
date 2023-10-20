@@ -64,6 +64,19 @@ const argv = yargs(hideBin(process.argv))
             default: false,
             type: 'boolean'
           },
+          'thread': {
+            alias: ['t'],
+            desc: 'Number of parallel downloads',
+            default: 10,
+            type: 'number'
+          },
+          'lang': {
+            desc: 'Set language of work metadata',
+            default: 'ja-jp',
+            deprecated: false,
+            choices: ['ja-jp', 'en-us', 'zh-cn'],
+            type: 'string'
+          },
           'proxy': {
             desc: 'Use streaming API server',
             default: false,
@@ -75,7 +88,14 @@ const argv = yargs(hideBin(process.argv))
             default: false,
             deprecated: true,
             type: 'boolean'
-          }
+          },
+          'log-level': {
+            desc: 'Set log level',
+            default: 'info',
+            deprecated: false,
+            choices: ['trace', 'debug', 'info', 'warn', 'error', 'fatal'],
+            type: 'string'
+          },
         })
     },
     handler: (argv) => {
@@ -92,16 +112,44 @@ const argv = yargs(hideBin(process.argv))
           describe: 'DLsite RJ Code (Work ID)',
           type: 'number',
         })
+        .options({
+          'lang': {
+            desc: 'Set language of work metadata',
+            default: 'ja-jp',
+            deprecated: false,
+            choices: ['ja-jp', 'en-us', 'zh-cn'],
+            type: 'string'
+          },
+          'proxy': {
+            desc: 'Use streaming API server',
+            default: false,
+            deprecated: true,
+            type: 'boolean'
+          },
+          'disable-ping': {
+            desc: 'Disable pinging the server\nThis option reduces startup time',
+            default: false,
+            deprecated: true,
+            type: 'boolean'
+          },
+          'log-level': {
+            desc: 'Set log level',
+            default: 'info',
+            deprecated: false,
+            choices: ['trace', 'debug', 'info', 'warn', 'error', 'fatal'],
+            type: 'string'
+          }
+        })
         .demandOption(['id'])
     },
     handler: (argv) => {
-      extComponents.lookup.lookup(logger, argv.id);
+      extComponents.lookup.lookup(logger, argv, argv.id);
     }
   })
-  .usage('$0 <command> [argument]')
+  .usage('$0 <command> [argument] [option]')
   .epilogue(configData.base.applicationCopyrightShort)
   .demandCommand(1)
-  .help('h')
+  .help()
   .version()
   .strict()
   .recommendCommands()
