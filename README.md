@@ -4,7 +4,7 @@
 
 This is a simple Node.js command line tool that I built for myself.
 
-Feel free to contribute and send questions!
+Feel free to contribute!
 
 ## Usage
 
