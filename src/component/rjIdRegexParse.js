@@ -8,7 +8,7 @@ module.exports = function rjIdRegexParse (input) {
   } else {
     return null;
   }
-  obj = {
+  let obj = {
     raw: input,
     parsed: output
   };

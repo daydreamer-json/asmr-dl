@@ -8,7 +8,7 @@ const dispWorkInfo = require('./component/dispWorkInfo');
 
 module.exports.download = async function download (logger, argv, id) {
   logger.level = argv.logLevel;
-  parsedIdObj = rjIdRegexParse(id);
+  const parsedIdObj = rjIdRegexParse(id);
   if (parsedIdObj === null) {
     logger.error(`Entered ID is invalid. Please input correct ID.`);
   } else {

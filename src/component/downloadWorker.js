@@ -3,7 +3,7 @@ const configData = require('../config/default.json');
 const rjIdRegexParse = require('./rjIdRegexParse');
 const clui = require('clui');
 const cliProgress = require('cli-progress');
-const _chalk = import("chalk").then(m=>m.default);
+const color = require('ansi-colors');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
@@ -33,7 +33,6 @@ function isFileAlreadyExistsCheckSync (pathString) {
 
 async function downloadFile (argv, logger, url, pathString, rootPath) {
   let writeMode = null;
-  let passed = false;
   if (argv.force) {
     writeMode = 'w';
   } else {
@@ -61,7 +60,6 @@ async function downloadFile (argv, logger, url, pathString, rootPath) {
 }
 
 module.exports = async function downloadWork (logger, argv, id, downloadTrackListArray, apiWorkInfoObj) {
-  const chalk = await _chalk;
   logger.info(`Downloading RJ${id.parsed} ...`);
   if (argv.proxy === true) logger.info('Download using proxy.');
   const rootDirectory = path.join(path.resolve(argv.outputDir), `RJ${id.parsed}`);
@@ -76,7 +74,7 @@ module.exports = async function downloadWork (logger, argv, id, downloadTrackLis
   let downloadedFiles = 0;
   let activeDownloads = 0;
   const progressBar = new cliProgress.SingleBar({
-    format: '[' + chalk.green('{bar}') + '] {percentage}% | {value}/{total} files | {duration_formatted} | eta {eta_formatted} | {filename}',
+    format: '[' + color.green('{bar}') + '] {percentage}% | {value}/{total} files | {duration_formatted} | eta {eta_formatted} | {filename}',
     barsize: 65,
     fps: 10,
     barCompleteChar: '#',
