@@ -1,6 +1,6 @@
 {
   "name": "@daydreamer-json/asmr-dl",
-  "version": "0.0.2",
+  "version": "0.0.3",
   "description": "Download ASMR Resources from asmr.one",
   "bin": {
     "asmr-dl": "src/index.js"
