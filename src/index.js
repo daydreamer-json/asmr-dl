@@ -36,7 +36,7 @@ console.log(figlet.textSync(configData.base.applicationName, {
 }));
 console.log('='.repeat(42) + '\n');
 
-
+// Command line parser
 const argv = yargs(hideBin(process.argv))
   .scriptName(configData.base.applicationName)
   .command({
@@ -50,6 +50,16 @@ const argv = yargs(hideBin(process.argv))
           type: 'number',
         })
         .demandOption(['id'])
+        .example([
+          [
+            '$0 download 01026121 -f -t 16',
+            'Download ASMR work RJ01026121\nForce overwrite all files\nDownload with 16 parallel thread'
+          ],
+          [
+            '$0 dl 276666 -o C:\\ASMR --server mirror2',
+            'Download ASMR work RJ276666\nDownload to "C:\\ASMR" folder\nUse mirror2 API server'
+          ]
+        ])
         .options({
           'output-dir': {
             alias: ['o'],
@@ -70,11 +80,24 @@ const argv = yargs(hideBin(process.argv))
             default: 10,
             type: 'number'
           },
+          'save-metadata': {
+            alias: ['m'],
+            desc: 'Save work metadata to output directory',
+            default: false,
+            type: 'boolean'
+          },
           'lang': {
             desc: 'Set language of work metadata',
             default: 'ja-jp',
             deprecated: false,
             choices: ['ja-jp', 'en-us', 'zh-cn'],
+            type: 'string'
+          },
+          'server': {
+            desc: 'Set API server',
+            default: 'latest',
+            deprecated: false,
+            choices: ['latest', 'original', 'mirror1', 'mirror2', 'mirror3'],
             type: 'string'
           },
           'proxy': {
@@ -112,12 +135,29 @@ const argv = yargs(hideBin(process.argv))
           describe: 'DLsite RJ Code (Work ID)',
           type: 'number',
         })
+        .example([
+          [
+            '$0 lookup 01026121 --log-level trace',
+            'Display metadata of RJ01026121\nSet log level to TRACE'
+          ],
+          [
+            '$0 info 276666 --lang en-us --server mirror2',
+            'Display metadata of RJ276666\nSet metadata tags language to "en-us"\nUse mirror2 API server'
+          ]
+        ])
         .options({
           'lang': {
             desc: 'Set language of work metadata',
             default: 'ja-jp',
             deprecated: false,
             choices: ['ja-jp', 'en-us', 'zh-cn'],
+            type: 'string'
+          },
+          'server': {
+            desc: 'Set API server',
+            default: 'latest',
+            deprecated: false,
+            choices: ['latest', 'original', 'mirror1', 'mirror2', 'mirror3'],
             type: 'string'
           },
           'proxy': {
@@ -147,6 +187,16 @@ const argv = yargs(hideBin(process.argv))
     }
   })
   .usage('$0 <command> [argument] [option]')
+  .example([
+    [
+      '$0 download 01026121',
+      'Download ASMR work RJ01026121'
+    ],
+    [
+      '$0 lookup 276666',
+      'Display metadata of ASMR work RJ276666'
+    ]
+  ])
   .epilogue(configData.base.applicationCopyrightShort)
   .demandCommand(1)
   .help()

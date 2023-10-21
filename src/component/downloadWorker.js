@@ -59,6 +59,31 @@ async function downloadFile (argv, logger, url, pathString, rootPath) {
   }
 }
 
+async function saveMetadataToJsonFile (argv, apiWorkInfoObj, rootPath) {
+  const prunedApiWorkInfoObj = apiWorkInfoObj.pruned;
+  const excludeKeys = ['samCoverUrl', 'thumbnailCoverUrl', 'mainCoverUrl'];
+  const optimizedApiWorkInfoObj = Object.keys(prunedApiWorkInfoObj)
+    .filter(key => !excludeKeys.includes(key))
+    .reduce((obj, key) => {
+      obj[key] = prunedApiWorkInfoObj[key];
+      return obj;
+    }, {});
+  const jsonFilename = 'info.json';
+  let writeMode = null;
+  if (argv.force) {
+    writeMode = 'w';
+  } else {
+    writeMode = 'wx';
+  }
+  if (writeMode === 'w' || (writeMode === 'wx' && isFileAlreadyExistsCheckSync(path.resolve(path.join(rootPath, jsonFilename))) === true)) {
+    try {
+      await fs.promises.writeFile(path.resolve(path.join(rootPath, jsonFilename)), JSON.stringify(optimizedApiWorkInfoObj, null, '  '), {flags: writeMode});
+    } catch (error) {
+      throw new Error(error);
+    }
+  }
+}
+
 module.exports = async function downloadWork (logger, argv, id, downloadTrackListArray, apiWorkInfoObj) {
   logger.info(`Downloading RJ${id.parsed} ...`);
   if (argv.proxy === true) logger.info('Download using proxy.');
@@ -91,7 +116,7 @@ module.exports = async function downloadWork (logger, argv, id, downloadTrackLis
     activeDownloads++;
     progressBar.update(downloadedFiles, {"filename": downloadTrackListArray[i].path});
     if (argv.proxy === true) {
-      fileUrl = `${configData.api.baseUrl}/media/stream/${downloadTrackListArray[i].hash}`;
+      fileUrl = `https://${configData.api.baseDomain[serverLocation]}${configData.api.apiPath}/media/stream/${downloadTrackListArray[i].hash}`;
     } else {
       fileUrl = downloadTrackListArray[i].url;
     }
@@ -104,7 +129,15 @@ module.exports = async function downloadWork (logger, argv, id, downloadTrackLis
         logger.info('Finalizing ...');
         downloadFile(argv, logger, apiWorkInfoObj.pruned.mainCoverUrl, 'cover.jpg', rootDirectory).then(() => {
           logger.info('Finalized.');
-          logger.info('All files downloaded successfully.');
+          if (argv.saveMetadata === true) {
+            logger.info('Saving metadata ...');
+            saveMetadataToJsonFile(argv, apiWorkInfoObj, rootDirectory).then(() => {
+              logger.info('Saved metadata.');
+              logger.info('All files downloaded successfully.');
+            })
+          } else {
+            logger.info('All files downloaded successfully.');
+          }
         }).catch((error) => {
           logger.error(`Error while finalizing: ${error.message}`);
           if (error.response && error.response.status >= 400) {

@@ -1,4 +1,3 @@
-const configData = require('../config/default.json');
 const log4js = require('log4js');
 const rjIdRegexParse = require('./rjIdRegexParse');
 const fs = require('fs');

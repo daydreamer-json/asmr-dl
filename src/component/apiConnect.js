@@ -5,6 +5,7 @@ const clc = require('cli-color');
 const log4js = require('log4js');
 const axios = require('axios');
 const ping = require('ping');
+let serverLocation = '';
 
 async function apiSendVerifyPing () {
   let extraArg = [];
@@ -13,7 +14,7 @@ async function apiSendVerifyPing () {
   } else {
     extraArg = ['-i', '0.3', '-c', '4'];
   }
-  const response = await ping.promise.probe(`${configData.api.baseDomain}`, {
+  const response = await ping.promise.probe(`${configData.api.baseDomain[serverLocation]}`, {
     timeout: 10,
     extra: extraArg
   });
@@ -24,7 +25,7 @@ async function apiSendVerifyPing () {
 async function apiGetHealth () {
   try {
     const response = await axios.get(
-      `${configData.api.baseUrl}/health`,
+      `https://${configData.api.baseDomain[serverLocation]}${configData.api.apiPath}/health`,
       {
         'headers': {
           'Referer': configData.api.refererUrl,
@@ -42,10 +43,10 @@ async function apiGetHealth () {
   }
 }
 
-async function apiConnectGetBasicWorkInfo (logger, id) {
+async function apiConnectGetBasicWorkInfo (id) {
   try {
     const response = await axios.get(
-      `${configData.api.baseUrl}/work/${id}`,
+      `https://${configData.api.baseDomain[serverLocation]}${configData.api.apiPath}/work/${id}`,
       {
         'headers': {
           'Referer': configData.api.refererUrl,
@@ -59,10 +60,10 @@ async function apiConnectGetBasicWorkInfo (logger, id) {
   }
 }
 
-async function apiConnectGetPrunedWorkInfo (logger, id) {
+async function apiConnectGetPrunedWorkInfo (id) {
   try {
     const response = await axios.get(
-      `${configData.api.baseUrl}/workInfo/${id}`,
+      `https://${configData.api.baseDomain[serverLocation]}${configData.api.apiPath}/workInfo/${id}`,
       {
         'headers': {
           'Referer': configData.api.refererUrl,
@@ -76,10 +77,10 @@ async function apiConnectGetPrunedWorkInfo (logger, id) {
   }
 }
 
-async function apiConnectGetWorkTracksInfo (logger, id) {
+async function apiConnectGetWorkTracksInfo (id) {
   try {
     const response = await axios.get(
-      `${configData.api.baseUrl}/tracks/${id}`,
+      `https://${configData.api.baseDomain[serverLocation]}${configData.api.apiPath}/tracks/${id}`,
       {
         'headers': {
           'Referer': configData.api.refererUrl,
@@ -95,6 +96,7 @@ async function apiConnectGetWorkTracksInfo (logger, id) {
 
 
 module.exports = async function apiGetWorkInfo (logger, argv, id) {
+  serverLocation = argv.server;
   let apiPingString = null;
   if (argv.disablePing === false) {
     logger.debug('Pinging ...');
@@ -125,9 +127,9 @@ module.exports = async function apiGetWorkInfo (logger, argv, id) {
       logger.info(`Getting work info of ID RJ${id.parsed} ...`);
       spinner = new clui.Spinner (`Getting work info of ID RJ${id.parsed} ...`, configData.base.spinnerSeq);
       spinner.start();
-      apiWorkInfoObj.basic = await apiConnectGetBasicWorkInfo(logger, id.raw);
-      apiWorkInfoObj.pruned = await apiConnectGetPrunedWorkInfo(logger, id.raw);
-      apiWorkInfoObj.tracks = await apiConnectGetWorkTracksInfo(logger, id.raw);
+      apiWorkInfoObj.basic = await apiConnectGetBasicWorkInfo(id.raw);
+      apiWorkInfoObj.pruned = await apiConnectGetPrunedWorkInfo(id.raw);
+      apiWorkInfoObj.tracks = await apiConnectGetWorkTracksInfo(id.raw);
       spinner.stop();
       if (apiWorkInfoObj.basic.status && apiWorkInfoObj.basic.status >= 400) {
         logger.error(`API request error: HTTP ${apiWorkInfoObj.basic.status} ${apiWorkInfoObj.basic.statusText}`);
