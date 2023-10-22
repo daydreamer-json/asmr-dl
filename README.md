@@ -69,6 +69,18 @@ Options:
                                                                [default: "info"]
 ```
 
+## To-Do
+
+- [x] Download
+  - [x] Specify output path
+  - [x] Parallel download (w/Any parallel connect count)
+  - [x] Cover image download (forced)
+  - [x] Metadata JSON download (selectable)
+  - [ ] Mirror server support
+  - [x] Streaming API server support
+  - [ ] Change module `axios` to `node-fetch`
+- [x] Metadata lookup
+
 ---
 
 (C) 2023 daydreamer-json
