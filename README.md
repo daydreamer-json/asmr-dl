@@ -73,7 +73,8 @@ Options:
 
 - [x] Download
   - [x] Specify output path
-  - [x] Parallel download (w/Any parallel connect count)
+  - [x] Parallel download (w/any parallel connect count)
+  - [ ] Show parallelized download progress
   - [x] Cover image download (forced)
   - [x] Metadata JSON download (selectable)
   - [ ] Mirror server support
