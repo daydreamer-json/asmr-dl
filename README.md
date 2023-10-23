@@ -29,19 +29,24 @@ Positionals:
   id  DLsite RJ Code (Work ID)                               [number] [required]
 
 Options:
-      --help          Show help                                        [boolean]
-      --version       Show version number                              [boolean]
-  -o, --output-dir    Output directory              [string] [default: "output"]
-  -f, --force         Force overwrites existing files [boolean] [default: false]
-  -t, --thread        Number of parallel downloads        [number] [default: 10]
-      --lang          Set language of work metadata
+      --help           Show help                                       [boolean]
+      --version        Show version number                             [boolean]
+  -o, --output-dir     Output directory             [string] [default: "output"]
+  -f, --force          Force overwrites existing files[boolean] [default: false]
+  -t, --thread         Number of parallel downloads       [number] [default: 10]
+  -m, --save-metadata  Save work metadata to output directory
+                                                      [boolean] [default: false]
+      --lang           Set language of work metadata
                 [string] [choices: "ja-jp", "en-us", "zh-cn"] [default: "ja-jp"]
-      --proxy         Use streaming API server
+      --server         Set API server
+       [string] [choices: "latest", "original", "mirror1", "mirror2", "mirror3"]
+                                                             [default: "latest"]
+      --proxy          Use streaming API server
                                          [deprecated] [boolean] [default: false]
-      --disable-ping  Disable pinging the server
-                      This option reduces startup time
+      --disable-ping   Disable pinging the server
+                       This option reduces startup time
                                          [deprecated] [boolean] [default: false]
-      --log-level     Set log level
+      --log-level      Set log level
           [string] [choices: "trace", "debug", "info", "warn", "error", "fatal"]
                                                                [default: "info"]
 ```
@@ -59,6 +64,9 @@ Options:
   --version       Show version number                                  [boolean]
   --lang          Set language of work metadata
                 [string] [choices: "ja-jp", "en-us", "zh-cn"] [default: "ja-jp"]
+  --server        Set API server
+       [string] [choices: "latest", "original", "mirror1", "mirror2", "mirror3"]
+                                                             [default: "latest"]
   --proxy         Use streaming API server
                                          [deprecated] [boolean] [default: false]
   --disable-ping  Disable pinging the server
@@ -77,9 +85,9 @@ Options:
   - [ ] Show parallelized download progress
   - [x] Cover image download (forced)
   - [x] Metadata JSON download (selectable)
-  - [ ] Mirror server support
+  - [x] Mirror server support
   - [x] Streaming API server support
-  - [ ] Change module `axios` to `node-fetch`
+  - [x] Change module `axios` to `node-fetch`
 - [x] Metadata lookup
 
 ---

@@ -2,7 +2,7 @@
   "base": {
     "applicationName": "asmr-dl",
     "applicationCopyrightShort": "(C) 2023 daydreamer-json",
-    "applicationVersionNumber": "0.0.3",
+    "applicationVersionNumber": "0.0.4",
     "spinnerSeq": ["⠋","⠙","⠹","⠸","⠼","⠴","⠦","⠧","⠇","⠏"]
   },
   "api": {

@@ -4,14 +4,31 @@ const rjIdRegexParse = require('./rjIdRegexParse');
 const clui = require('clui');
 const cliProgress = require('cli-progress');
 const color = require('ansi-colors');
+const fetch = require('node-fetch');
 const axios = require('axios');
 const fs = require('fs');
 const path = require('path');
+const unavailableFileStringObj = {
+  'win': [
+    {'before': '/', 'after': '／'},
+    {'before': ':', 'after': '：'},
+    {'before': '*', 'after': '＊'},
+    {'before': '?', 'after': '？'},
+    {'before': '"', 'after': '＂'},
+    {'before': '<', 'after': '＜'},
+    {'before': '>', 'after': '＞'},
+    {'before': '|', 'after': '｜'}
+  ],
+  'linux': [
+    {'before': '/', 'after': '／'}
+  ]
+};
+let serverLocation = '';
 
 async function createFolder (downloadTrackListArray, rootPath) {
   const tempArr1 = downloadTrackListArray.map((obj) => path.dirname(obj.path));
   const tempArr2 = Array.from(new Set(tempArr1));
-  const folderList = tempArr2.map((obj) => path.resolve(path.join(rootPath, obj)));
+  const folderList = tempArr2.map((obj) => path.resolve(path.join(rootPath, fileNameValidateNormalize(obj, true))));
   for (let i = 0; i < folderList.length; i++) {
     const folderPath = folderList[i];
     try {
@@ -31,27 +48,62 @@ function isFileAlreadyExistsCheckSync (pathString) {
   }
 }
 
+function fileNameValidateNormalize (pathString, isFolder) {
+  let unavailableCharacters = [];
+  if (process.platform === 'win32') {
+    unavailableCharacters = unavailableFileStringObj.win;
+    for (let i = 0; i < unavailableCharacters.length; i++) {
+      pathString = pathString.split(unavailableCharacters[i].before).join(unavailableCharacters[i].after);
+    }
+    return pathString;
+  } else {
+    unavailableCharacters = unavailableFileStringObj.linux;
+    if (isFolder === false) {
+      for (let i = 0; i < unavailableCharacters.length; i++) {
+        pathString = pathString.split(unavailableCharacters[i].before).join(unavailableCharacters[i].after);
+      }
+      return pathString;
+    } else {
+      return pathString;
+    }
+  }
+}
+
 async function downloadFile (argv, logger, url, pathString, rootPath) {
+  const validatedPathString = path.resolve(path.join(rootPath, fileNameValidateNormalize(path.dirname(pathString), true), fileNameValidateNormalize(path.basename(pathString), false)));
   let writeMode = null;
   if (argv.force) {
     writeMode = 'w';
   } else {
     writeMode = 'wx';
   }
-  if (writeMode === 'w' || (writeMode === 'wx' && isFileAlreadyExistsCheckSync(path.resolve(path.join(rootPath, pathString))) === true)) {
-    const writer = fs.createWriteStream(path.resolve(path.join(rootPath, pathString)), {flags: writeMode});
-    const response = await axios({
-      'url': url,
-      'method': 'GET',
-      'headers': {
+  if (writeMode === 'w' || (writeMode === 'wx' && isFileAlreadyExistsCheckSync(validatedPathString) === true)) {
+    await new Promise(resolve => setTimeout(resolve, 1000));
+    const writer = fs.createWriteStream(validatedPathString, {flags: writeMode});
+    // const response = await axios({
+    //   'url': url,
+    //   'method': 'GET',
+    //   'headers': {
+    //     'Referer': configData.api.refererUrl,
+    //     'User-Agent': configData.api.userAgent
+    //   },
+    //   'timeout': 30000,
+    //   'responseType': 'stream'
+    // });
+    // response.data.pipe(writer);
+    const response = await fetch(url, {
+      headers: {
         'Referer': configData.api.refererUrl,
         'User-Agent': configData.api.userAgent
       },
-      'responseType': 'stream'
+      'timeout': 30000
     });
-    response.data.pipe(writer);
+    response.body.pipe(writer);
     return new Promise((resolve, reject) => {
-      writer.on('finish', resolve);
+      writer.on('finish', () => {
+        writer.close();
+        resolve();
+      });
       writer.on('error', reject);
     });
   } else {
@@ -85,6 +137,7 @@ async function saveMetadataToJsonFile (argv, apiWorkInfoObj, rootPath) {
 }
 
 module.exports = async function downloadWork (logger, argv, id, downloadTrackListArray, apiWorkInfoObj) {
+  serverLocation = argv.server;
   logger.info(`Downloading RJ${id.parsed} ...`);
   if (argv.proxy === true) logger.info('Download using proxy.');
   const rootDirectory = path.join(path.resolve(argv.outputDir), `RJ${id.parsed}`);
@@ -146,7 +199,7 @@ module.exports = async function downloadWork (logger, argv, id, downloadTrackLis
         });
       }
     }).catch((error) => {
-      logger.error(`Error while downloading file ${path.basename(downloadTrackListArray[i].path)}: ${error.message}`);
+      logger.error(`\nError while downloading file ${path.basename(downloadTrackListArray[i].path)}: ${error.message}`);
       activeDownloads--;
       if (error.response && error.response.status >= 400) {
         console.error(`Request error: ${error.response.status} ${error.response.statusText}`);

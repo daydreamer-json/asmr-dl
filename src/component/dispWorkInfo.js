@@ -9,7 +9,13 @@ module.exports = (argv, apiWorkInfoObj) => {
     vadisp = '---';
   }
   if (apiWorkInfoObj.pruned.tags.length !== 0) {
-    tagdisp = apiWorkInfoObj.pruned.tags.map((obj) => obj.i18n[argv.lang].name).join(', ')
+    tagdisp = apiWorkInfoObj.pruned.tags.map(function (obj) {
+      if (Object.keys(obj.i18n).length === 0) {
+        return obj.name;
+      } else {
+        return obj.i18n[argv.lang].name;
+      }
+    }).join(', ');
   } else {
     tagdisp = '---'
   }
