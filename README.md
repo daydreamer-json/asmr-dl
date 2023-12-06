@@ -1,4 +1,4 @@
-![asmr-dl](https://socialify.git.ci/daydreamer-json/asmr-dl/image?description=1&forks=1&issues=1&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fdaydreamer-json%2Fasmr-dl%2Fmain%2Fmedia%2Ficon%2Fatom.svg&owner=1&pattern=Circuit%20Board&pulls=1&stargazers=1&theme=Auto)
+![asmr-dl](https://socialify.git.ci/daydreamer-json/asmr-dl/image?description=1&forks=0&issues=0&language=1&logo=https%3A%2F%2Fraw.githubusercontent.com%2Fdaydreamer-json%2Fasmr-dl%2Fmain%2Fmedia%2Ficon%2Fatom.svg&owner=1&pattern=Circuit%20Board&pulls=0&stargazers=0&theme=Auto)
 
 ## About
 
